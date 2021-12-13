@@ -14,8 +14,8 @@ namespace gk_p4
     class Screen
     {
         public Matrix<double> Matrix { get; private set; }
-        public double N { get; private set; } = 1;
-        public double F { get; private set; } = 100;
+        public double N { get; private set; } = 1.0;
+        public double F { get; private set; } = 100.0;
         public double FOV { get; private set; }
         public double A { get; private set; }
 
@@ -39,12 +39,12 @@ namespace gk_p4
 
         public void CalculateMatrix()
         {
-            double e = 1 / Math.Tan((double)this.FOV / 2);
+            double e = 1.0 / Math.Tan((double)this.FOV / 2);
 
             this.Matrix[0, 0] = e;
             this.Matrix[1, 1] = e / this.A;
             this.Matrix[2, 2] = -(this.F + this.N) / (this.F - this.N);
-            this.Matrix[2, 3] = -(2 * this.F * this.N) / (this.F - this.N);
+            this.Matrix[2, 3] = -(2.0 * this.F * this.N) / (this.F - this.N);
             this.Matrix[3, 2] = -1;
         }
 
@@ -60,8 +60,6 @@ namespace gk_p4
 
             double x = pPrim[0, 0] / pPrim[3, 0];
             double y = pPrim[1, 0] / pPrim[3, 0];
-
-            if (x < -1 || x > 1 || y < -1 || y > 1) return null;
 
             return new Point((int)((x + 1.0) * ((double)width / 2.0)), height - (int)((y + 1.0) * ((double)height / 2.0)));
 

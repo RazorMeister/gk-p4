@@ -16,7 +16,7 @@ namespace gk_p4
         private Camera camera;
         private Screen screen;
         private Pyramid pyramid;
-        private Pyramid pyramidSecond;
+        private Pyramid pyramid2;
 
         public Form1()
         {
@@ -27,17 +27,25 @@ namespace gk_p4
             this.screen = new Screen();
             this.screen.SetA(this.wrapper.Width, this.wrapper.Height);
 
-            this.pyramid = new Pyramid(1);
+            this.pyramid = new Pyramid();
             this.pyramid.Vertex = Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 2 });
             this.pyramid.A = Vector<double>.Build.DenseOfArray(new double[] { -1, -1, 0 });
             this.pyramid.B = Vector<double>.Build.DenseOfArray(new double[] { 1, -1, 0 });
             this.pyramid.C = Vector<double>.Build.DenseOfArray(new double[] { 1, 1, 0 });
             this.pyramid.D = Vector<double>.Build.DenseOfArray(new double[] { -1, 1, 0 });
+
+            this.pyramid2 = new Pyramid(1);
+            this.pyramid2.Vertex = Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 2 });
+            this.pyramid2.A = Vector<double>.Build.DenseOfArray(new double[] { -1, -1, 0 });
+            this.pyramid2.B = Vector<double>.Build.DenseOfArray(new double[] { 1, -1, 0 });
+            this.pyramid2.C = Vector<double>.Build.DenseOfArray(new double[] { 1, 1, 0 });
+            this.pyramid2.D = Vector<double>.Build.DenseOfArray(new double[] { -1, 1, 0 });
         }
 
         private void wrapper_Paint(object sender, PaintEventArgs e)
         {
             this.screen.ToBitmap(this.wrapper.Width, this.wrapper.Height, this.camera, this.pyramid, e);
+            this.screen.ToBitmap(this.wrapper.Width, this.wrapper.Height, this.camera, this.pyramid2, e);
         }
 
         private void Form1_Resize(object sender, EventArgs e)
@@ -55,6 +63,7 @@ namespace gk_p4
         private void timer1_Tick(object sender, EventArgs e)
         {
             this.pyramid.IncrementAlfa();
+            this.pyramid2.IncrementAlfa();
             this.wrapper.Invalidate();
         }
     }

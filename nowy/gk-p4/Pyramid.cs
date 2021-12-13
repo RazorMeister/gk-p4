@@ -26,6 +26,7 @@ namespace gk_p4
 
         public Pyramid(int type = 0)
         {
+            this.Type = type;
             this.Matrix = Matrix<double>.Build.Dense(4, 4);
             this.CalculateMatrix();
         }
@@ -79,10 +80,6 @@ namespace gk_p4
             var d = func(this.D);
 
             Pen black = new Pen(Brushes.Black);
-
-            //Debug.WriteLine(vertex);
-            //Debug.WriteLine(a);
-            //Debug.WriteLine(b);
 
             if (vertex != null && a != null)
                 e.Graphics.DrawLine(black, (Point)vertex, (Point)a);
