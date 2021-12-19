@@ -1,13 +1,9 @@
 ﻿using gk_p3;
 using MathNet.Numerics.LinearAlgebra;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using gk_p4.Shapes;
 
 namespace gk_p4
 {
@@ -48,7 +44,7 @@ namespace gk_p4
             this.Matrix[3, 2] = -1;
         }
 
-        public Point? ToPoint(int width, int height, Matrix<double> modelMatrix, Matrix<double> viewMatrix, Matrix<double> projMatrix, Vector<double> point)
+        public Point ToPoint(int width, int height, Matrix<double> modelMatrix, Matrix<double> viewMatrix, Matrix<double> projMatrix, Vector<double> point)
         {
             Matrix<double> pointVector = Matrix<double>.Build.Dense(4, 1);
             pointVector[0, 0] = point[0];
@@ -62,14 +58,13 @@ namespace gk_p4
             double y = pPrim[1, 0] / pPrim[3, 0];
 
             return new Point((int)((x + 1.0) * ((double)width / 2.0)), height - (int)((y + 1.0) * ((double)height / 2.0)));
-
         }
 
-        public FastBitmap ToBitmap(int width, int height, Camera camera, Pyramid pyramid, PaintEventArgs e)
+        public FastBitmap ToBitmap(int width, int height, Camera camera, Shape3D shape, PaintEventArgs e)
         {
             var bm = new FastBitmap(width, height);
 
-            pyramid.Draw(e, (Vector<double> p) => this.ToPoint(width, height, pyramid.Matrix, camera.Matrix, this.Matrix, p));
+            shape.Draw(e, (Vector<double> p) => this.ToPoint(width, height, shape.Matrix, camera.Matrix, this.Matrix, p));
 
             return bm;
         }

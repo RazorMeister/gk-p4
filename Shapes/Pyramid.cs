@@ -1,17 +1,11 @@
-﻿using gk_p3;
-using MathNet.Numerics.LinearAlgebra;
+﻿using MathNet.Numerics.LinearAlgebra;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace gk_p4
+namespace gk_p4.Shapes
 {
-    class Pyramid
+    class Pyramid : Shape3D
     {
         public Matrix<double> Matrix { get; private set; }
         public Vector<double> Vertex { get; set; }
@@ -71,7 +65,7 @@ namespace gk_p4
             this.CalculateMatrix();
         }
 
-        public void Draw(PaintEventArgs e, Func<Vector<double>, Point?> func)
+        public void Draw(PaintEventArgs e, Func<Vector<double>, Point> func)
         {
             var vertex = func(this.Vertex);
             var a = func(this.A);
@@ -81,29 +75,14 @@ namespace gk_p4
 
             Pen black = new Pen(Brushes.Black);
 
-            if (vertex != null && a != null)
-                e.Graphics.DrawLine(black, (Point)vertex, (Point)a);
-
-            if (vertex != null && b != null)
-                e.Graphics.DrawLine(black, (Point)vertex, (Point)b);
-
-            if (vertex != null && c != null)
-                e.Graphics.DrawLine(black, (Point)vertex, (Point)c);
-
-            if (vertex != null && d != null)
-                e.Graphics.DrawLine(black, (Point)vertex, (Point)d);
-
-            if (a != null && b != null)
-                e.Graphics.DrawLine(black, (Point)a, (Point)b);
-
-            if (b != null && c != null)
-                e.Graphics.DrawLine(black, (Point)b, (Point)c);
-
-            if (c != null && d != null)
-                e.Graphics.DrawLine(black, (Point)c, (Point)d);
-
-            if (d != null && a != null)
-                e.Graphics.DrawLine(black, (Point)d, (Point)a);
+            e.Graphics.DrawLine(black, (Point)vertex, (Point)a);
+            e.Graphics.DrawLine(black, (Point)vertex, (Point)b);
+            e.Graphics.DrawLine(black, (Point)vertex, (Point)c);
+            e.Graphics.DrawLine(black, (Point)vertex, (Point)d);
+            e.Graphics.DrawLine(black, (Point)a, (Point)b);
+            e.Graphics.DrawLine(black, (Point)b, (Point)c);
+            e.Graphics.DrawLine(black, (Point)c, (Point)d);
+            e.Graphics.DrawLine(black, (Point)d, (Point)a);
         }
     }
 }
