@@ -53,7 +53,7 @@ namespace gk_p4.Filler
                     int xMin = (int)AET[i].X;
                     int xMax = (int)AET[i + 1].X;
 
-                    for (int x = xMin; x < xMax; x++)
+                    for (int x = xMin; x <= xMax; x++)
                         callback(x, y);
                 }
 

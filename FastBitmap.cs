@@ -3,7 +3,7 @@ using System.Drawing.Imaging;
 using System;
 using System.Drawing;
 
-namespace gk_p3
+namespace gk_p4
 {
     internal class FastBitmap : IDisposable
     {
@@ -30,6 +30,8 @@ namespace gk_p3
 
         public void SetPixel(int x, int y, Color color)
         {
+            if (x < 0 || y < 0 || x > this.Width || y > this.Height) return;
+
             int index = x + (y * Width);
             Bits[index] = color.ToArgb();
         }
