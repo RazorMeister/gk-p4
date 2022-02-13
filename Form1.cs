@@ -1,99 +1,134 @@
 ﻿using System;
-using System.Collections.Generic;
-using MathNet.Numerics.LinearAlgebra;
 using System.Windows.Forms;
-using System.Drawing;
 using gk_p4.Shapes;
-using System.Diagnostics;
+using gk_p4.Scene;
+using gk_p4.Cameras;
+using gk_p4.Shading;
 
 namespace gk_p4
 {
     public partial class Form1 : Form
     {
-        private Camera camera;
-        private Screen screen;
-        private List<Shape3D> shapes = new List<Shape3D>();
+        private readonly Scene.Scene scene;
+
+        private readonly ICamera staticObjectCamera;
+        private readonly ICamera staticSceneCamera;
+        private readonly ICamera dynamicObjectCamera;
+        private readonly ICamera dynamicSceneCamera;
 
         public Form1()
         {
             InitializeComponent();
 
-            this.camera = new Camera();
+            this.staticObjectCamera = new CameraStatic(new Point3d(5.0, 0.0, 0.5));
+            this.staticSceneCamera = new CameraStatic(new Point3d(0.0, -6.0, 2.0));
 
-            this.screen = new Screen();
-            this.screen.SetA(this.wrapper.Width, this.wrapper.Height);
-            this.screen.CreateNewZBuffer(this.wrapper.Width, this.wrapper.Height);
+            this.dynamicObjectCamera = new CameraDynamicObject(new Point3d(7.0, 0.0, 1.0));
+            this.dynamicSceneCamera = new CameraDynamicScene(new Point3d(5.0, 0.0, 1.0));
 
-            Pyramid pyramid = new Pyramid();
-            pyramid.Vertex = Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 2 });
-            pyramid.A = Vector<double>.Build.DenseOfArray(new double[] { -1, -1, 0 });
-            pyramid.B = Vector<double>.Build.DenseOfArray(new double[] { 1, -1, 0 });
-            pyramid.C = Vector<double>.Build.DenseOfArray(new double[] { 1, 1, 0 });
-            pyramid.D = Vector<double>.Build.DenseOfArray(new double[] { -1, 1, 0 });
-
-            this.SetPyarmidColor(pyramid);
-
-            Pyramid pyramid2 = new Pyramid(1);
-            pyramid2.Vertex = Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 2 });
-            pyramid2.A = Vector<double>.Build.DenseOfArray(new double[] { -1, -1, 0 });
-            pyramid2.B = Vector<double>.Build.DenseOfArray(new double[] { 1, -1, 0 });
-            pyramid2.C = Vector<double>.Build.DenseOfArray(new double[] { 1, 1, 0 });
-            pyramid2.D = Vector<double>.Build.DenseOfArray(new double[] { -1, 1, 0 });
-
-            this.SetPyarmidColor(pyramid2);
-
-            this.shapes.Add(pyramid);
-            this.shapes.Add(pyramid2);
-        }
-
-        private void SetPyarmidColor(Pyramid pyramid)
-        {
-            pyramid.MakeTriangles(new Color[]
-            {
-                Color.Red,
-                Color.Blue,
-                Color.Green,
-                Color.Yellow,
-
-                Color.Black
-            });
+            this.scene = SceneFactory.CreateScene(this.wrapper.Width, this.wrapper.Height).SetCamera(staticObjectCamera);
         }
 
         private void wrapper_Paint(object sender, PaintEventArgs e)
         {
-            this.screen.ResetZBuffer();
+            this.scene.ResetZBuffer();
 
             using (FastBitmap bm = new FastBitmap(this.wrapper.Width, this.wrapper.Height))
             {
-                this.shapes.ForEach(shape => this.screen.ToBitmap(this.wrapper.Width, this.wrapper.Height, bm, this.camera, shape, e));
+                this.scene.ToBitmap(bm, e);
                 e.Graphics.DrawImage(bm.Bitmap, 0, 0);
             }
         }
 
         private void Form1_Resize(object sender, EventArgs e)
         {
-            if (this.wrapper != null && this.screen != null)
+            if (this.wrapper != null && this.scene != null)
             {
-                this.SetPyarmidColor((Pyramid)this.shapes[0]);
-                this.SetPyarmidColor((Pyramid)this.shapes[1]);
-
-                this.screen.SetA(this.wrapper.Width, this.wrapper.Height);
-                this.screen.CreateNewZBuffer(this.wrapper.Width, this.wrapper.Height);
+                this.scene.UpdateWidthAndHeight(this.wrapper.Width, this.wrapper.Height);
                 this.wrapper.Invalidate();
             }
         }
 
-        private void trackBar1_Scroll(object sender, EventArgs e)
+        private void timer1_Tick(object sender, EventArgs e)
         {
-            this.screen.SetFOV(this.trackBar1.Value);
             this.wrapper.Invalidate();
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        #region Shading events
+        private void shadingContantRadio_CheckedChanged(object sender, EventArgs e)
         {
-            ((Pyramid)this.shapes[0]).IncrementAlfa();
-            ((Pyramid)this.shapes[1]).IncrementAlfa();
+            this.scene.SetShadingType(ShadingTypeEnum.Const);
+        }
+
+        private void shadingPhongRadio_CheckedChanged(object sender, EventArgs e)
+        {
+            this.scene.SetShadingType(ShadingTypeEnum.Phong);
+        }
+
+        private void shadingGouraudRadio_CheckedChanged(object sender, EventArgs e)
+        {
+            this.scene.SetShadingType(ShadingTypeEnum.Gouraud);
+        }
+        #endregion
+
+
+        #region Light setting events
+        private void kdTrackBar_Scroll(object sender, EventArgs e)
+        {
+            double kdValue = this.kdTrackBar.Value / 10.0;
+            this.scene.SetKd(kdValue);
+            kdLabel.Text = $"Kd: {kdValue}";
+        }
+
+        private void ksTrackBar_Scroll(object sender, EventArgs e)
+        {
+            double ksValue = this.ksTrackBar.Value / 10.0;
+            this.scene.SetKs(ksValue);
+            ksLabel.Text = $"Ks: {ksValue}";
+        }
+
+        private void mTrackBar_Scroll(object sender, EventArgs e)
+        {
+            int mValue = this.mTrackBar.Value;
+            this.scene.SetM(mValue);
+            mLabel.Text = $"M: {mValue}";
+        }
+        #endregion
+
+
+        #region Camera events
+        private void trackBar1_Scroll(object sender, EventArgs e)
+        {
+            this.scene.SetFOV(this.trackBar1.Value);
+            this.fovLabel.Text = $"FOV: {this.trackBar1.Value}";
             this.wrapper.Invalidate();
+        }
+
+        private void cameraStaticForObject_CheckedChanged(object sender, EventArgs e)
+        {
+            this.scene.SetCamera(this.staticObjectCamera);
+        }
+
+        private void cameraStaticForScene_CheckedChanged(object sender, EventArgs e)
+        {
+            this.scene.SetCamera(this.staticSceneCamera);
+        }
+
+        private void cameraDynamicForObject_CheckedChanged(object sender, EventArgs e)
+        {
+            this.scene.SetCamera(this.dynamicObjectCamera);
+        }
+
+        private void cameraDynamicForScene_CheckedChanged(object sender, EventArgs e)
+        {
+            this.scene.SetCamera(this.dynamicSceneCamera);
+        }
+        #endregion
+
+        private void animationOnCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (this.animationOnCheckbox.Checked) this.scene.StartAnimations();
+            else this.scene.StopAnimations();
         }
     }
 }
