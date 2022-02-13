@@ -62,7 +62,6 @@ namespace gk_p4.Scene
             Light backLight = new Light(new Point3d(-3.0, 0.0, 0.0), Color.White);
             Light frontLightLeft = new Light(new Point3d(3.0, -3.0, 0.0), Color.White);
             Light frontLightRight = new Light(new Point3d(3.0, 3.0, 0.0), Color.White);
-            Light leftLight = new Light(new Point3d(0.0, -5.0, 0.0), Color.White);
             Light topLight = new Light(new Point3d(1.0, 0.0, 3.0), Color.White);
 
             Reflector reflector = new Reflector(new Point3d(2.0, 0.0, 0.5), Color.Pink, new Point3d(0.0, 0.0, -0.5));
